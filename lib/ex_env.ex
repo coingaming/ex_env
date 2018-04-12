@@ -13,6 +13,7 @@ defmodule ExEnv do
 
   """
   def hello do
-    :world
+    ok = :world
+    ok
   end
 end
