@@ -6,6 +6,8 @@
   "skip_files": [
     "test/*",
 
+    "lib/ex_env.ex",
+
     "lib/ex_env_web.ex",
     "lib/ex_env/application.ex",
     "lib/ex_env/repo.ex",
