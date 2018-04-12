@@ -34,8 +34,9 @@ export BEST_APP_CONFIG="                                          \
 ### config.exs
 
 ```elixir
-use ExEnv.Config
-ExEnv.Config.config(:best_app)
+use ExEnv
+ExEnv.config(:best_app)
+ExEnv.config(:other_app, "CUSTOM_ENV_VAR")
 ```
 
 ### source code

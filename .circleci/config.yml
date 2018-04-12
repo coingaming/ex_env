@@ -1,0 +1,115 @@
+defaults: &defaults
+  docker:
+    - image: tim2cf/elixir-builder:1.6
+
+version: 2
+jobs:
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name:       Check variables
+          command:    ./scripts/check-vars.sh "in system" "ROBOT_SSH_KEY" "COVERALLS_REPO_TOKEN"
+      - run:
+          name:       Setup robot SSH key
+          command:    echo "$ROBOT_SSH_KEY" | base64 --decode > $HOME/.ssh/id_rsa.robot && chmod 600 $HOME/.ssh/id_rsa.robot && ssh-add $HOME/.ssh/id_rsa.robot
+      - run:
+         name:        Setup SSH config
+         command:     echo -e "Host *\n IdentityFile $HOME/.ssh/id_rsa.robot\n IdentitiesOnly yes" > $HOME/.ssh/config
+      - run:
+          name:       Fetch submodules
+          command:    git submodule update --init --recursive
+      - restore_cache:
+          keys:
+            - v1-deps-cache-{{ checksum "mix.lock" }}
+            - v1-deps-cache
+      - run:
+          name:       Fetch dependencies
+          command:    mix deps.get
+      - run:
+          name:       Compile dependencies
+          command:    mix deps.compile
+      - run:
+          name:       Compile protocols
+          command:    mix compile.protocols --warnings-as-errors
+      - save_cache:
+          key: v1-deps-cache-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+            - deps
+            - ~/.mix
+      - run:
+          name:       Run tests
+          command:    mix coveralls.circle
+      - run:
+          name:       Run style checks
+          command:    mix credo --strict
+      - restore_cache:
+          keys:
+            - v1-dialyzer-plt-cache-{{ checksum "mix.lock" }}
+            - v1-plt-cache
+      - run:
+          name:       Run Dialyzer type checks
+          command:    mix dialyzer --halt-exit-status
+          no_output_timeout: 15m
+      - save_cache:
+          key: v1-dialyzer-plt-cache-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+            - ~/.mix
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - .
+  doc:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name:       Check variables
+          command:    ./scripts/check-vars.sh "in system" "ROBOT_SSH_KEY" "CONFLUENCE_SECRET"
+      - run:
+          name:       Setup robot SSH key
+          command:    echo "$ROBOT_SSH_KEY" | base64 --decode > $HOME/.ssh/id_rsa.robot && chmod 600 $HOME/.ssh/id_rsa.robot && ssh-add $HOME/.ssh/id_rsa.robot
+      - run:
+         name:        Setup SSH config
+         command:     echo -e "Host *\n IdentityFile $HOME/.ssh/id_rsa.robot\n IdentitiesOnly yes" > $HOME/.ssh/config
+      - run:
+          name:       Fetch submodules
+          command:    git submodule update --init --recursive
+      - run:
+          name:       Fetching dependencies
+          command:    mix deps.get
+      - run:
+          name:       Compile protocols
+          command:    mix compile.protocols --warnings-as-errors
+      - run:
+          name:       Compile documentation
+          command:    mix docs
+      - run:
+          name:       Push documentation to confluence
+          command:    export $(cat "./scripts/.env" | xargs) && mix boilex.ci.confluence.push "$CIRCLE_TAG"
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only: /^([A-Z]{2,}-[0-9]+|hotfix-.+)$/
+  test-doc:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /^master$/
+      - doc:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /^master$/
