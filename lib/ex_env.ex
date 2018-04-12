@@ -70,11 +70,11 @@ defmodule ExEnv do
                   {config_term, []} = Code.eval_quoted(config_ast)
                   config(unquote(otp_app), config_term)
                 false ->
-                  "application #{otp_app} got not keyword list AST from #{config_string}"
+                  "application #{unquote(otp_app)} got not keyword list AST from #{config_string}"
                   |> raise
               end
             {:error, error} ->
-              "application #{otp_app} got error #{inspect error} while parse AST of #{config_string}"
+              "application #{unquote(otp_app)} got error #{inspect error} while parse AST of #{config_string}"
               |> raise
           end
       end
