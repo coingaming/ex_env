@@ -34,8 +34,8 @@ export BEST_APP_CONFIG="                                          \
 ### config.exs
 
 ```elixir
-use Mix.Config
-config :best_app, ExEnv.get("BEST_APP_CONFIG")
+use ExEnv.Config
+ExEnv.Config.config(:best_app)
 ```
 
 ### source code
