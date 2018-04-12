@@ -5,7 +5,9 @@ For security reasons only literals/terms are allowed in configs (no functions, m
 
 # Installation
 
-`git clone git@github.com:heathmont/ex_env.git && cd ./ex_env && mix deps.get && mix archive.build && mix archive.install`
+```
+mix archive.install github heathmont/ex_env
+```
 
 # Usage
 
