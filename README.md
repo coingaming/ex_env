@@ -3,6 +3,12 @@
 Tool provides support of Elixir terms in system env variables.
 For security reasons only literals/terms are allowed in configs (no functions, macros, modules etc).
 
+# Installation
+
+`git clone git@github.com:heathmont/ex_env.git && cd ./ex_env && mix deps.get && mix archive.build && mix archive.install`
+
+# Usage
+
 ### OS
 
 ```
