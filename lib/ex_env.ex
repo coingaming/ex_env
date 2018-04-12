@@ -28,7 +28,10 @@ defmodule ExEnv do
     ```
 
   """
-  defmacro config(otp_app) when is_atom(otp_app) do
+
+  defmacro config(otp_app_ast) do
+    {otp_app, []} = Code.eval_quoted(otp_app_ast)
+
     os_var_name = "#{otp_app |> Atom.to_string |> String.upcase}_CONFIG"
     quote do
       ExEnv.config(unquote(otp_app), unquote(os_var_name))
@@ -62,20 +65,20 @@ defmodule ExEnv do
           |> Code.string_to_quoted
           |> case do
             {:ok, config_ast} ->
-              config_ast
-              |> Keyword.keyword?
-              |> case do
-                true ->
+              # config_ast
+              # |> Keyword.keyword?
+              # |> case do
+              #   true ->
                   :ok = ExEnv.Utils.validate_config_ast(config_ast)
                   {config_term, []} = Code.eval_quoted(config_ast)
                   config(unquote(otp_app), config_term)
                 false ->
                   "application #{unquote(otp_app)} got not keyword list AST from #{config_string}"
                   |> raise
-              end
-            {:error, error} ->
-              "application #{unquote(otp_app)} got error #{inspect error} while parse AST of #{config_string}"
-              |> raise
+            #   end
+            # {:error, error} ->
+            #   "application #{unquote(otp_app)} got error #{inspect error} while parse AST of #{config_string}"
+            #   |> raise
           end
       end
     end
