@@ -30,11 +30,16 @@ defmodule ExEnv do
   """
 
   defmacro config(otp_app_ast) do
-    {otp_app, []} = Code.eval_quoted(otp_app_ast)
-
-    os_var_name = "#{otp_app |> Atom.to_string |> String.upcase}_CONFIG"
     quote do
-      ExEnv.config(unquote(otp_app), unquote(os_var_name))
+
+      otp_app = unquote(otp_app_ast)
+
+      unless is_atom(otp_app) do
+        "otp_app should be Erlang atom type, but got #{inspect otp_app}"
+        |> raise
+      end
+
+      ExEnv.config(otp_app, "#{otp_app |> Atom.to_string |> String.upcase}_CONFIG")
     end
   end
 
@@ -52,10 +57,26 @@ defmodule ExEnv do
 
   """
 
-  defmacro config(otp_app, os_var_name) when is_atom(otp_app) and is_binary(os_var_name) do
-    :ok = ExEnv.Utils.validate_otp_app(otp_app)
+  defmacro config(otp_app_ast, os_var_name_ast) do
+
     quote do
-      unquote(os_var_name)
+
+      otp_app = unquote(otp_app_ast)
+      os_var_name = unquote(os_var_name_ast)
+
+      unless is_atom(otp_app) do
+        "otp_app should be Erlang atom type, but got #{inspect otp_app}"
+        |> raise
+      end
+
+      unless String.valid?(os_var_name) do
+        "os_var_name should be string, but got #{os_var_name}"
+        |> raise
+      end
+
+      :ok = ExEnv.Utils.validate_otp_app(otp_app)
+
+      os_var_name
       |> System.get_env
       |> case do
         nil ->
@@ -65,20 +86,20 @@ defmodule ExEnv do
           |> Code.string_to_quoted
           |> case do
             {:ok, config_ast} ->
-              # config_ast
-              # |> Keyword.keyword?
-              # |> case do
-              #   true ->
+              config_ast
+              |> Keyword.keyword?
+              |> case do
+                true ->
                   :ok = ExEnv.Utils.validate_config_ast(config_ast)
                   {config_term, []} = Code.eval_quoted(config_ast)
-                  config(unquote(otp_app), config_term)
+                  config(otp_app, config_term)
                 false ->
-                  "application #{unquote(otp_app)} got not keyword list AST from #{config_string}"
+                  "application #{otp_app} got not keyword list AST from #{config_string}"
                   |> raise
-            #   end
-            # {:error, error} ->
-            #   "application #{unquote(otp_app)} got error #{inspect error} while parse AST of #{config_string}"
-            #   |> raise
+              end
+            {:error, error} ->
+              "application #{otp_app} got error #{inspect error} while parse AST of #{config_string}"
+              |> raise
           end
       end
     end
