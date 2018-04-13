@@ -6,7 +6,7 @@ For security reasons only literals/terms are allowed in configs (no functions, m
 # Installation
 
 ```
-mix archive.install github heathmont/ex_env
+mix archive.install github heathmont/ex_env --force
 ```
 
 # Usage
