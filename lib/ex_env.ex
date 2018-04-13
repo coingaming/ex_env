@@ -86,17 +86,9 @@ defmodule ExEnv do
           |> Code.string_to_quoted
           |> case do
             {:ok, config_ast} ->
-              config_ast
-              |> Keyword.keyword?
-              |> case do
-                true ->
-                  :ok = ExEnv.Utils.validate_config_ast(config_ast)
-                  {config_term, []} = Code.eval_quoted(config_ast)
-                  config(otp_app, config_term)
-                false ->
-                  "application #{otp_app} got not keyword list AST from #{config_string}"
-                  |> raise
-              end
+              :ok = ExEnv.Utils.validate_config_ast(config_ast)
+              {config_term, []} = Code.eval_quoted(config_ast)
+              config(otp_app, config_term)
             {:error, error} ->
               "application #{otp_app} got error #{inspect error} while parse AST of #{config_string}"
               |> raise
