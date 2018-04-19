@@ -40,17 +40,72 @@ defmodule ExEnv.Utils do
   ## Example
 
     ```
-    iex> ExEnv.Utils.validate_config_ast([foo: 123])
+    iex> quote do [foo: 123] end |> ExEnv.Utils.validate_config_ast
     :ok
+    iex> quote do [1, 2, 3] end |> ExEnv.Utils.validate_config_ast
+    :ok
+    iex> quote do %{hello: "world"} end |> ExEnv.Utils.validate_config_ast
+    :ok
+    iex> quote do {:hello, "world"} end |> ExEnv.Utils.validate_config_ast
+    :ok
+    iex> quote do {:hello, "world", 123} end |> ExEnv.Utils.validate_config_ast
+    :ok
+    iex> quote do [{Hello.World, [foo: "bar"]}] end |> ExEnv.Utils.validate_config_ast
+    :ok
+
+    iex> {:__aliases__, [], [Foo, "Bar"]} |> ExEnv.Utils.validate_config_ast
+    ** (RuntimeError) wrong submodule "Bar" name in AST chunk {:__aliases__, [], [Foo, "Bar"]}
+
+    iex> quote do Foo.bar("hello") end |> ExEnv.Utils.validate_config_ast
+    ** (RuntimeError) invalid or unsafe config AST {{:., [], [{:__aliases__, [alias: false], [:Foo]}, :bar]}, [], ["hello"]}
     ```
 
   """
 
-  def validate_config_ast(_) do
-    #
-    # TODO : implement validation!!!
-    #
+  def validate_config_ast(list) when is_list(list) do
+    list
+    |> Enum.each(&(:ok = validate_config_ast(&1)))
+  end
+
+  def validate_config_ast({:%{}, _, pairs}) when is_list(pairs) do
+    pairs
+    |> Enum.each(fn({key, value}) ->
+      :ok = validate_config_ast(key)
+      :ok = validate_config_ast(value)
+    end)
+  end
+
+  def validate_config_ast({el1, el2}) do
+    :ok = validate_config_ast(el1)
+    :ok = validate_config_ast(el2)
+  end
+
+  def validate_config_ast({:{}, _, values}) do
+    values
+    |> Enum.each(&validate_config_ast/1)
+  end
+
+  def validate_config_ast(ast = {:__aliases__, _, submodules = [_ | _]}) do
+    submodules
+    |> Enum.each(fn(sub) ->
+      unless is_atom(sub) do
+        "wrong submodule #{inspect sub} name in AST chunk #{inspect ast}"
+        |> raise
+      end
+    end)
+  end
+
+  def validate_config_ast(data) when
+                                  is_atom(data) or
+                                  is_binary(data) or
+                                  is_number(data)
+                                do
     :ok
+  end
+
+  def validate_config_ast(ast) do
+    "invalid or unsafe config AST #{inspect ast}"
+    |> raise
   end
 
 end
