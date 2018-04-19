@@ -6,8 +6,10 @@ For security reasons only literals/terms are allowed in configs (no functions, m
 # Installation
 
 ```
-mix archive.install github heathmont/ex_env --force
+mix archive.install github heathmont/ex_env tag vX.X.X --force
 ```
+
+where X.X.X is ExEnv [version](https://github.com/heathmont/ex_env/releases) in semver format.
 
 # Usage
 
