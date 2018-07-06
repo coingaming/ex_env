@@ -52,6 +52,8 @@ defmodule ExEnv.Utils do
     :ok
     iex> quote do [{Hello.World, [foo: "bar"]}] end |> ExEnv.Utils.validate_config_ast
     :ok
+    iex> quote do %Date{year: 1990, month: 1, day: 1} end |> ExEnv.Utils.validate_config_ast
+    :ok
 
     iex> {:__aliases__, [], [Foo, "Bar"]} |> ExEnv.Utils.validate_config_ast
     ** (RuntimeError) wrong submodule "Bar" name in AST chunk {:__aliases__, [], [Foo, "Bar"]}
@@ -73,6 +75,10 @@ defmodule ExEnv.Utils do
       :ok = validate_config_ast(key)
       :ok = validate_config_ast(value)
     end)
+  end
+
+  def validate_config_ast({:%, _, ast}) do
+    :ok = validate_config_ast(ast)
   end
 
   def validate_config_ast({el1, el2}) do
