@@ -10,6 +10,15 @@ defmodule ExEnv do
     quote do
       use Mix.Config
       require ExEnv
+
+      Mix.Project.config[:deps]
+      |> Enum.each(fn(dependency) ->
+        ExEnv.config(elem(dependency, 0))
+      end)
+
+      ExEnv.config(Mix.Project.config[:app])
+      ExEnv.config(:logger)
+
     end
   end
 

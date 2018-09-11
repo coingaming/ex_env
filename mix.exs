@@ -5,13 +5,13 @@ defmodule ExEnv.MixProject do
     [
       app: :ex_env,
       version: ("VERSION" |> File.read! |> String.trim),
-      elixir: "~> 1.6",
+      elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       # excoveralls
       test_coverage:      [tool: ExCoveralls],
       preferred_cli_env:  [
-        "coveralls":            :test,
+        coveralls:              :test,
         "coveralls.travis":     :test,
         "coveralls.circle":     :test,
         "coveralls.semaphore":  :test,
@@ -28,8 +28,8 @@ defmodule ExEnv.MixProject do
       ],
       # ex_doc
       name:         "ExEnv",
-      source_url:   "https://github.com/heathmont/ex_env",
-      homepage_url: "https://github.com/heathmont/ex_env",
+      source_url:   "https://github.com/coingaming/ex_env",
+      homepage_url: "https://github.com/coingaming/ex_env",
       docs:         [main: "readme", extras: ["README.md"]],
       # hex.pm stuff
       description:  "Tool provides support of Elixir terms in system env variables",
@@ -38,7 +38,7 @@ defmodule ExEnv.MixProject do
         files: ["lib", "priv", "mix.exs", "README*", "VERSION*"],
         maintainers: ["tim2CF"],
         links: %{
-          "GitHub" => "https://github.com/heathmont/ex_env",
+          "GitHub" => "https://github.com/coingaming/ex_env",
         }
       ],
     ]
@@ -57,9 +57,9 @@ defmodule ExEnv.MixProject do
       # development tools
       {:excoveralls, "~> 0.8",            only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 0.5",               only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.18",                only: [:dev, :test], runtime: false},
-      {:credo, "~> 0.8",                  only: [:dev, :test], runtime: false},
-      {:boilex, github: "tim2CF/boilex",  only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.19",                only: [:dev, :test], runtime: false},
+      {:credo, "~> 0.9",                  only: [:dev, :test], runtime: false},
+      {:boilex, "~> 0.2.7",               only: [:dev, :test], runtime: false},
     ]
   end
 end
