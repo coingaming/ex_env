@@ -1,5 +1,8 @@
 # Change Log
 
+## [v0.2.2](https://github.com/coingaming/ex_env/tree/v0.2.2) (2018-07-06)
+[Full Changelog](https://github.com/coingaming/ex_env/compare/v0.2.0...v0.2.2)
+
 ## [v0.2.0](https://github.com/coingaming/ex_env/tree/v0.2.0) (2018-04-19)
 
 
