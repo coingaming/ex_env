@@ -13,7 +13,7 @@ where X.X.X is ExEnv [version](https://github.com/heathmont/ex_env/releases) in 
 
 # Usage
 
-For every OTP application, default system variable name is **<UPPER_CASE_OTP_APP>_CONFIG**. Example:
+For every OTP application, default system variable name is **&lt;UPPER_CASE_OTP_APP&gt;_CONFIG**. Example:
 
 ### OS
 
