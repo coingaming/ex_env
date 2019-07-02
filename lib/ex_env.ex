@@ -11,14 +11,13 @@ defmodule ExEnv do
       use Mix.Config
       require ExEnv
 
-      Mix.Project.config[:deps]
-      |> Enum.each(fn(dependency) ->
+      Mix.Project.config()[:deps]
+      |> Enum.each(fn dependency ->
         ExEnv.config(elem(dependency, 0))
       end)
 
-      ExEnv.config(Mix.Project.config[:app])
+      ExEnv.config(Mix.Project.config()[:app])
       ExEnv.config(:logger)
-
     end
   end
 
@@ -40,15 +39,14 @@ defmodule ExEnv do
 
   defmacro config(otp_app_ast) do
     quote do
-
       otp_app = unquote(otp_app_ast)
 
       unless is_atom(otp_app) do
-        "otp_app should be Erlang atom type, but got #{inspect otp_app}"
+        "otp_app should be Erlang atom type, but got #{inspect(otp_app)}"
         |> raise
       end
 
-      ExEnv.config(otp_app, "#{otp_app |> Atom.to_string |> String.upcase}_CONFIG")
+      ExEnv.config(otp_app, "#{otp_app |> Atom.to_string() |> String.upcase()}_CONFIG")
     end
   end
 
@@ -67,14 +65,12 @@ defmodule ExEnv do
   """
 
   defmacro config(otp_app_ast, os_var_name_ast) do
-
     quote do
-
       otp_app = unquote(otp_app_ast)
       os_var_name = unquote(os_var_name_ast)
 
       unless is_atom(otp_app) do
-        "otp_app should be Erlang atom type, but got #{inspect otp_app}"
+        "otp_app should be Erlang atom type, but got #{inspect(otp_app)}"
         |> raise
       end
 
@@ -86,24 +82,25 @@ defmodule ExEnv do
       :ok = ExEnv.Utils.validate_otp_app(otp_app)
 
       os_var_name
-      |> System.get_env
+      |> System.get_env()
       |> case do
         nil ->
           :ok
+
         config_string when is_binary(config_string) ->
           config_string
-          |> Code.string_to_quoted
+          |> Code.string_to_quoted()
           |> case do
             {:ok, config_ast} ->
               :ok = ExEnv.Utils.validate_config_ast(config_ast)
               {config_term, []} = Code.eval_quoted(config_ast)
               config(otp_app, config_term)
+
             {:error, error} ->
-              "application #{otp_app} got error #{inspect error} while parse AST of #{config_string}"
+              "application #{otp_app} got error #{inspect(error)} while parse AST of #{config_string}"
               |> raise
           end
       end
     end
   end
-
 end

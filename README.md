@@ -2,14 +2,13 @@
 
 Tool provides support of Elixir terms in system env variables.
 For security reasons only literals/terms are allowed in configs (no functions, macros, modules etc).
+I very recommend to combine this tool with [BootEnv](https://github.com/coingaming/boot_env).
 
 # Installation
 
 ```
 mix archive.install hex ex_env 0.3.0 --force
 ```
-
-where X.X.X is ExEnv [version](https://github.com/heathmont/ex_env/releases) in semver format.
 
 # Usage
 

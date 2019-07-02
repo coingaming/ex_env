@@ -1,5 +1,4 @@
 defmodule ExEnv.Utils do
-
   @moduledoc """
 
   ExEnv general utilities.
@@ -27,6 +26,7 @@ defmodule ExEnv.Utils do
     |> case do
       true ->
         :ok
+
       false ->
         "invalid OTP application name #{otp_app}"
         |> raise
@@ -71,7 +71,7 @@ defmodule ExEnv.Utils do
 
   def validate_config_ast({:%{}, _, pairs}) when is_list(pairs) do
     pairs
-    |> Enum.each(fn({key, value}) ->
+    |> Enum.each(fn {key, value} ->
       :ok = validate_config_ast(key)
       :ok = validate_config_ast(value)
     end)
@@ -93,25 +93,23 @@ defmodule ExEnv.Utils do
 
   def validate_config_ast(ast = {:__aliases__, _, submodules = [_ | _]}) do
     submodules
-    |> Enum.each(fn(sub) ->
+    |> Enum.each(fn sub ->
       unless is_atom(sub) do
-        "wrong submodule #{inspect sub} name in AST chunk #{inspect ast}"
+        "wrong submodule #{inspect(sub)} name in AST chunk #{inspect(ast)}"
         |> raise
       end
     end)
   end
 
-  def validate_config_ast(data) when
-                                  is_atom(data) or
-                                  is_binary(data) or
-                                  is_number(data)
-                                do
+  def validate_config_ast(data)
+      when is_atom(data) or
+             is_binary(data) or
+             is_number(data) do
     :ok
   end
 
   def validate_config_ast(ast) do
-    "invalid or unsafe config AST #{inspect ast}"
+    "invalid or unsafe config AST #{inspect(ast)}"
     |> raise
   end
-
 end
