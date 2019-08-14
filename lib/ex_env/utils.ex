@@ -21,7 +21,7 @@ defmodule ExEnv.Utils do
   """
 
   def validate_otp_app(otp_app) when is_atom(otp_app) do
-    ~r/^([a-z]+[a-z0-9]*)(_[a-z]+[a-z0-9]*)*([a-z]+[a-z0-9]*)$/
+    ~r/^([a-z]+[a-z0-9]*)(_[a-z]+[a-z0-9]*)*$/
     |> Regex.match?(Atom.to_string(otp_app))
     |> case do
       true ->
