@@ -8,7 +8,7 @@ defmodule ExEnv do
 
   defmacro __using__([]) do
     quote do
-      use Mix.Config
+      use Config
       require ExEnv
 
       Mix.Project.config()[:deps]
@@ -23,7 +23,7 @@ defmodule ExEnv do
 
   @doc """
 
-  Works as Mix.Config.Config macro.
+  Works as Config.config macro.
   Gets single argument, name of otp_app (atom).
   Infers config system variable name from otp_app argument:
   capitalize name and adds _CONFIG postfix.
