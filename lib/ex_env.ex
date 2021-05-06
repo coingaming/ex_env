@@ -8,7 +8,7 @@ defmodule ExEnv do
 
   defmacro __using__([]) do
     quote do
-      use Config
+      import Config
       require ExEnv
 
       Mix.Project.config()[:deps]
